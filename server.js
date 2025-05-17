@@ -4,15 +4,32 @@ const axios = require("axios");
 
 const app = express();
 
+const allowedOrigin = "https://reactpdfreader.onrender.com";
+
 const corsOptions = {
-  origin: "https://reactpdfreader.onrender.com", // your frontend URL
+  origin: allowedOrigin,
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  allowedHeaders: ["Content-Type", "Authorization"],
   optionsSuccessStatus: 204,
 };
 
+// Log incoming requests for debugging
+app.use((req, res, next) => {
+  console.log(`Incoming request: ${req.method} ${req.url} from origin: ${req.headers.origin}`);
+  next();
+});
+
+// Use CORS with options
 app.use(cors(corsOptions));
 app.use(express.json());
-app.options("*", cors(corsOptions)); // enable preflight
+
+// Handle preflight OPTIONS requests explicitly
+app.options("*", (req, res) => {
+  res.header("Access-Control-Allow-Origin", allowedOrigin);
+  res.header("Access-Control-Allow-Methods", corsOptions.methods);
+  res.header("Access-Control-Allow-Headers", corsOptions.allowedHeaders.join(","));
+  res.sendStatus(corsOptions.optionsSuccessStatus);
+});
 
 app.post("/ask", async (req, res) => {
   try {
