@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
@@ -13,17 +15,9 @@ const corsOptions = {
   optionsSuccessStatus: 204,
 };
 
-// Log incoming requests for debugging
-app.use((req, res, next) => {
-  console.log(`Incoming request: ${req.method} ${req.url} from origin: ${req.headers.origin}`);
-  next();
-});
-
-// Use CORS with options
 app.use(cors(corsOptions));
 app.use(express.json());
 
-// Handle preflight OPTIONS requests explicitly
 app.options("*", (req, res) => {
   res.header("Access-Control-Allow-Origin", allowedOrigin);
   res.header("Access-Control-Allow-Methods", corsOptions.methods);
@@ -38,7 +32,7 @@ app.post("/ask", async (req, res) => {
       req.body,
       {
         headers: {
-          Authorization: `Bearer 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`,
+          Authorization: `Bearer ${process.env.GROQ_API_KEY}`,  // Use env variable here
           "Content-Type": "application/json",
         },
       }
